@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo y Boleta PDF - Frenos Automotriz LVS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-image: url('https://i.pinimg.com/originals/b0/78/a4/b078a43ec2550623feacc5180c0e7024.gif');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: #fff;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 36px;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-top: 0;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #00fff7, 0 0 20px #00d1ff, 0 0 30px #00ffb3;
+      }
+      to {
+        text-shadow: 0 0 20px #00ffbf, 0 0 30px #00ffc8, 0 0 40px #00ffee;
+      }
+    }
+
+    .container {
+      max-width: 950px;
+      margin: auto;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    #gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    #gallery div {
+      width: 150px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    #gallery img {
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid #00e0ff;
+      transition: transform 0.4s ease;
+    }
+
+    #gallery img:hover {
+      transform: scale(1.08);
+    }
+
+    label, input, select, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background-color: #00bcd4;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0097a7;
+    }
+
+    .product-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .product-image img {
+      max-width: 300px;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 3px solid #00e0ff;
+    }
+
+    .products-list {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .total {
+      font-size: 20px;
+      font-weight: bold;
+      color: #00ffba;
+    }
+
+    #qrcode {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 560px;
+      height: 315px;
+      border-radius: 10px;
+      border: 2px solid #00e0ff;
+      display: block;
+      margin: 20px auto;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #ddd;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      resize: none;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainContainer">
+    <h1>Frenos Automotriz LVS</h1>
+    <h2>Catálogo de Productos</h2>
+
+    <div id="gallery"></div>
+
+    <label for="product">Producto Seleccionado</label>
+    <select id="product" onchange="updateProductImage()"></select>
+
+    <div class="product-image">
+      <img id="productImage" src="" alt="Imagen del producto" />
+    </div>
+
+    <label for="quantity">Cantidad</label>
+    <input type="number" id="quantity" min="1" placeholder="Ingrese cantidad" />
+    <button onclick="addProduct()">Agregar al Carrito</button>
+
+    <h3>Productos en el Carrito</h3>
+    <div class="products-list" id="productsList"></div>
+    <div class="total" id="total">Total: S/. 0.00</div>
+
+    <!-- VIDEO DE YOUTUBE -->
+    <h3>Video Promocional</h3>
+    <iframe src="https://www.youtube.com/embed/1QqMuvWc9vk?si=5GDlfNBbdMWHzL45" allowfullscreen></iframe>
+
+    <!-- DATOS DEL CLIENTE -->
+    <h3>Datos del Cliente</h3>
+    <label for="customerName">Nombre</label>
+    <input type="text" id="customerName" />
+    <label for="customerSurname">Apellidos</label>
+    <input type="text" id="customerSurname" />
+    <label for="customerBirth">Fecha de Nacimiento</label>
+    <input type="date" id="customerBirth" />
+    <label for="customerEmail">Correo Electrónico</label>
+    <input type="email" id="customerEmail" />
+
+    <button onclick="generateReceipt()">Generar Boleta PDF</button>
+    <div id="qrcode"></div>
+
+    <!-- FORMULARIO DE CONTACTO -->
+    <h3>Contáctanos</h3>
+    <textarea placeholder="Escribe tu mensaje aquí..."></textarea>
+    <button onclick="alert('Gracias por contactarnos')">Enviar</button>
+
+    <footer>
+      <p>&copy; 2025 Frenos Automotriz LVS - Todos los derechos reservados.</p>
+      <p>Contacto: ventas@lvsmotors.com | +51 931310397</p>
+    </footer>
+  </div>
+
+  <!-- SCRIPT FINAL -->
+  <script>
+    const products = {
+      "Disco de freno": { price: 150 },
+      "Tambora de freno": { price: 180 },
+      "Pastilla de freno 5L": { price: 80 },
+      "Pastilla de freno 3L": { price: 95 },
+      "Zapatas blancas 1x": { price: 20 },
+      "Zapatas blancas 2x": { price: 25 },
+      "Líquido de freno Azul": { price: 14 },
+      "Líquido de freno Rojo": { price: 17 },
+      "Líquido de freno Negro": { price: 20 }
+    };
+
+    const productImages = {
+      "Disco de freno": "https://rtgrepuestos.com/wp-content/uploads/2024/08/20086946-2.jpg",
+      "Tambora de freno": "https://www.autofacil.es/wp-content/uploads/2021/05/frenosdetambor-scaled-1.jpg",
+      "Pastilla de freno 5L": "https://s.alicdn.com/@sc04/kf/H7436952f7dd74f04a364227ae2211f3f0.jpg",
+      "Pastilla de freno 3L": "https://s.alicdn.com/@sc04/kf/H0947316c2e79458b8f54cd6a21f9121bR.jpg",
+      "Zapatas blancas 1x": "https://s.alicdn.com/@sc04/kf/H5896e786230d43db883b09a680e895f7p.jpg",
+      "Zapatas blancas 2x": "https://i.ebayimg.com/thumbs/images/g/mAUAAOSwyQJcpHmU/s-l1200.jpg",
+      "Líquido de freno Azul": "https://cdn1.stackomni.com/movilcar/images/0002829.png",
+      "Líquido de freno Rojo": "https://gpc.pe/cdn/shop/products/4387-1_80290208-e8bd-4f90-ae3e-c11adeea2f1c.jpg",
+      "Líquido de freno Negro": "https://www.inkarepuestosyservicios.com/wp-content/uploads/2021/11/4.png"
+    };
+
+    const cart = [];
+
+    function createGallery() {
+      const galleryDiv = document.getElementById("gallery");
+      const select = document.getElementById("product");
+      for (const product in products) {
+        const div = document.createElement("div");
+        div.innerHTML = `<img src="${productImages[product]}" alt="${product}">
+                         <p>${product}<br>S/. ${products[product].price}</p>`;
+        div.onclick = () => {
+          select.value = product;
+          updateProductImage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        galleryDiv.appendChild(div);
+
+        const option = document.createElement("option");
+        option.value = product;
+        option.textContent = product;
+        select.appendChild(option);
+      }
+    }
+
+    function updateProductImage() {
+      const product = document.getElementById("product").value;
+      document.getElementById("productImage").src = productImages[product];
+    }
+
+    function addProduct() {
+      const product = document.getElementById("product").value;
+      const quantity = parseInt(document.getElementById("quantity").value);
+      if (!quantity || quantity <= 0) {
+        alert("Ingrese una cantidad válida.");
+        return;
+      }
+      const price = products[product].price;
+      cart.push({ name: product, quantity, price, total: quantity * price });
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById("productsList");
+      list.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.total;
+        list.innerHTML += `<div>${index + 1}. ${item.name} - ${item.quantity} x S/.${item.price} = <b>S/.${item.total.toFixed(2)}</b></div>`;
+      });
+      document.getElementById("total").innerText = `Total: S/. ${total.toFixed(2)}`;
+    }
+
+    async function generateReceipt() {
+      const name = document.getElementById("customerName").value.trim();
+      const surname = document.getElementById("customerSurname").value.trim();
+      const birth = document.getElementById("customerBirth").value;
+      const email = document.getElementById("customerEmail").value.trim();
+
+      if (!name || !surname || !birth || !email || cart.length === 0) {
+        alert("Complete todos los datos y agregue productos.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const width = doc.internal.pageSize.getWidth();
+      const height = doc.internal.pageSize.getHeight();
+
+      const bgImg = new Image();
+      bgImg.crossOrigin = "anonymous";
+      bgImg.src = "https://static.vecteezy.com/system/resources/previews/007/900/233/non_2x/lvs-letter-logo-design-on-white-background-lvs-creative-initials-letter-logo-concept-lvs-letter-design-vector.jpg";
+
+      bgImg.onload = () => {
+        doc.addImage(bgImg, 'JPEG', 0, 0, width, height);
+        doc.setFontSize(20);
+        doc.setTextColor(0, 0, 128);
+        doc.text("BOLETA DE VENTA", width / 2, 20, { align: 'center' });
+
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Cliente: ${name} ${surname}`, 14, 35);
+        doc.text(`Nacimiento: ${birth}`, 14, 42);
+        doc.text(`Correo: ${email}`, 14, 49);
+        doc.text(`Fecha: ${new Date().toLocaleString()}`, 14, 56);
+
+        let y = 65, total = 0;
+        cart.forEach((prod, i) => {
+          const sub = prod.price * prod.quantity;
+          doc.text(`${i + 1}. ${prod.name} x ${prod.quantity} = S/.${sub.toFixed(2)}`, 14, y);
+          y += 7;
+          total += sub;
+        });
+
+        doc.setTextColor(255, 0, 0);
+        doc.setFontSize(14);
+        doc.text(`TOTAL: S/. ${total.toFixed(2)}`, 14, y + 10);
+
+        const qrSize = 40;
+        const bottomY = height - qrSize - 30;
+
+        const qrWhatsApp = new QRious({ value: "https://w.app/lvs", size: 100 });
+        doc.addImage(qrWhatsApp.toDataURL(), 'PNG', 20, bottomY, qrSize, qrSize);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 255);
+        doc.text("WhatsApp", 20 + qrSize / 2, bottomY + qrSize + 5, { align: "center" });
+
+        const qrFacebook = new QRious({ value: "https://www.facebook.com/profile.php?id=61577350375989", size: 100 });
+        doc.addImage(qrFacebook.toDataURL(), 'PNG', width - qrSize - 20, bottomY, qrSize, qrSize);
+        doc.text("Facebook", width - qrSize / 2 - 20, bottomY + qrSize + 5, { align: "center" });
+
+        doc.setFontSize(12);
+        doc.setTextColor(50, 50, 50);
+        doc.text("Para mayor información, escanea nuestros códigos QR", width / 2, bottomY + qrSize + 20, { align: "center" });
+
+        doc.save(`boleta_${name}_${surname}.pdf`);
+      };
+    }
+
+    window.onload = () => {
+      createGallery();
+      updateProductImage();
+    };
+  </script>
+</body>
+</html>

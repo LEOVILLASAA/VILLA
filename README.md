@@ -1,5 +1,3 @@
-# VILLA
-VENTAS DE REPUESTOS AUTOMOTRIZ
 <!DOCTYPE html>
 <html lang="es">
 <head>
